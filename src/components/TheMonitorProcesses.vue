@@ -4,74 +4,93 @@
 			<h1 class="has-text-weight-bold mb-2">RUNNING PROCESSES</h1>
 		</div>
 		<div class="running-processes-table box mb-3">
-			<div class="table-container">
-				<table class="table is-fullwidth">
-					<thead>
-						<th @click="updateSortBy('name')">
-							<div class="is-flex is-fullwidth">
-								Process
-								<base-icon
-									class="sort-icon"
-									:class="{'is-reversed': reversedSortBy, 'is-visible': sortBy === 'name'}"
-									icon="las la-chevron-up"
-								/>
-							</div>
-						</th>
-						<th @click="updateSortBy('pid')">
-							<div class="is-flex is-fullwidth">
-								PID
-								<base-icon
-									class="sort-icon"
-									:class="{'is-reversed': reversedSortBy, 'is-visible': sortBy === 'pid'}"
-									icon="las la-chevron-up"
-								/>
-							</div>
-						</th>
-						<th @click="updateSortBy('cpu')" class="has-text-right">
-							<div class="is-flex is-fullwidth">
-								CPU
-								<base-icon
-									class="sort-icon"
-									:class="{'is-reversed': reversedSortBy, 'is-visible': sortBy === 'cpu'}"
-									icon="las la-chevron-up"
-								/>
-							</div>
-						</th>
-						<th @click="updateSortBy('rss')" class="has-text-right">
-							<div class="is-flex is-fullwidth">
-								RAM
-								<base-icon
-									class="sort-icon"
-									:class="{'is-reversed': reversedSortBy, 'is-visible': sortBy === 'rss'}"
-									icon="las la-chevron-up"
-								/>
-							</div>
-						</th>
-					</thead>
-					<tbody>
-						<tr
-							v-for="(process) in displayedRunningProcesses"
-							:key="process.pid"
-							:class="{'is-selected': currentSelectedPID === process.pid}"
-							@click="selectRow(process.pid)"
-						>
-							<td>
-								<img :src="process.path" alt />
-								{{process.name | nameFilter}}
-							</td>
-							<td>{{process.pid}}</td>
-							<td class="has-text-right">{{process.cpu | cpuFilter }}</td>
-							<td class="has-text-right">{{process.rss | rssFilter }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+			<base-transition>
+				<div v-if="!displayedRunningProcesses.length" class="loading">
+					Loading...
+				</div>
+				<div v-else class="table-container">
+					<table class="table is-fullwidth">
+						<thead>
+							<th @click="updateSortBy('name')">
+								<div class="is-flex is-fullwidth">
+									Process
+									<base-icon
+										class="sort-icon"
+										:class="{
+											'is-reversed': reversedSortBy,
+											'is-visible': sortBy === 'name',
+										}"
+										icon="las la-chevron-up"
+									/>
+								</div>
+							</th>
+							<th @click="updateSortBy('pid')">
+								<div class="is-flex is-fullwidth">
+									PID
+									<base-icon
+										class="sort-icon"
+										:class="{
+											'is-reversed': reversedSortBy,
+											'is-visible': sortBy === 'pid',
+										}"
+										icon="las la-chevron-up"
+									/>
+								</div>
+							</th>
+							<th @click="updateSortBy('cpu')" class="has-text-right">
+								<div class="is-flex is-fullwidth">
+									CPU
+									<base-icon
+										class="sort-icon"
+										:class="{
+											'is-reversed': reversedSortBy,
+											'is-visible': sortBy === 'cpu',
+										}"
+										icon="las la-chevron-up"
+									/>
+								</div>
+							</th>
+							<th @click="updateSortBy('rss')" class="has-text-right">
+								<div class="is-flex is-fullwidth">
+									RAM
+									<base-icon
+										class="sort-icon"
+										:class="{
+											'is-reversed': reversedSortBy,
+											'is-visible': sortBy === 'rss',
+										}"
+										icon="las la-chevron-up"
+									/>
+								</div>
+							</th>
+						</thead>
+						<tbody>
+							<tr
+								v-for="process in displayedRunningProcesses"
+								:key="process.pid"
+								:class="{ 'is-selected': currentSelectedPID === process.pid }"
+								@click="selectRow(process.pid)"
+							>
+								<td>
+									<img :src="process.path" alt />
+									{{ process.name | nameFilter }}
+								</td>
+								<td>{{ process.pid }}</td>
+								<td class="has-text-right">{{ process.cpu | cpuFilter }}</td>
+								<td class="has-text-right">{{ process.rss | rssFilter }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</base-transition>
 		</div>
 		<button
 			class="button close-process-button"
 			:disabled="currentSelectedPID === null"
 			@click="killProcess"
-		>Close Process</button>
+		>
+			Close Process
+		</button>
 	</div>
 </template>
 
@@ -137,6 +156,13 @@ export default {
 <style scoped lang="scss">
 .running-processes-table {
 	height: 220px;
+	position: relative;
+	.loading {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translateX(-50%), translateY(-50%);
+	}
 	.table-container {
 		overflow-y: scroll;
 		overflow-x: hidden;

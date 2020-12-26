@@ -31,7 +31,6 @@ export default {
 	},
 	mounted() {
 		ipcRenderer.on("update-memory-layout", (event, data) => {
-			console.log(data)
 			this.memoryLayout = data
 		})
 	},
